@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# build outputs
+dist/
+build/
+coverage/
+
+# env & config
+.env
+.env.*
+
+# logs
+*.log
+
+# lock files (optional – keep if you want formatted)
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# misc
+.DS_Store
+.vscode/
+.idea/

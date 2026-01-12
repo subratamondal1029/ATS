@@ -1,0 +1,13 @@
+{
+  "name": "ats-server",
+  "version": "1.0.0",
+  "description": "ATS platform server - Brief description of the ATS platform, SaaS model, and main features including hybrid resume sorting, stage time tracking, process management, and standard ATS features.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Subrata Mondal",
+  "license": "ISC",
+  "type": "module"
+}

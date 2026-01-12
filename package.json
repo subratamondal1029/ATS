@@ -1,0 +1,40 @@
+{
+  "name": "ats-platform",
+  "version": "1.0.0",
+  "description": "ATS platform - Brief description of the ATS platform, SaaS model, and main features including hybrid resume sorting, stage time tracking, process management, and standard ATS features.",
+  "scripts": {
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "typecheck": "tsc --noEmit -p ",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subratamondal1029/ATS.git"
+  },
+  "keywords": [
+    "ats",
+    "applicant tracking system",
+    "recruitment",
+    "hr software",
+    "resume sorting",
+    "process management",
+    "Ai"
+  ],
+  "author": "Subrata Mondal",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/subratamondal1029/ATS/issues"
+  },
+  "homepage": "https://github.com/subratamondal1029/ATS#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^25.0.6",
+    "eslint": "^9.39.2",
+    "globals": "^17.0.0",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.0"
+  }
+}
