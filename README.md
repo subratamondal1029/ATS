@@ -12,6 +12,7 @@
 
 # Folder Structure
 
+```
 /
 ├─ .gitignore
 ├─ .prettierrc
@@ -43,6 +44,7 @@
 ├─ index.ts/
 ├─ jobs/
 └─ queues/
+```
 
 # User Roles
 
