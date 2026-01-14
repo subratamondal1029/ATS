@@ -6,7 +6,8 @@
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p ",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "dev": "docker-compose up -d"
   },
   "repository": {
     "type": "git",

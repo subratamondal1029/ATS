@@ -10,7 +10,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-ats_dev}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-ATS}
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
@@ -52,7 +52,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 8000
-      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ats_dev?authSource=admin}
+      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ATS?authSource=admin}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
@@ -68,6 +68,11 @@ services:
         condition: service_healthy
     networks:
       - ats-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     command: npm run dev
 
   # Frontend Service
@@ -103,7 +108,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: development
-      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ats_dev?authSource=admin}
+      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ATS?authSource=admin}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     volumes:
       - ./worker/src:/app/src
