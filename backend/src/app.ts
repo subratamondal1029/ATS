@@ -3,6 +3,8 @@ import cors from "cors";
 import asyncHandler from "./utils/asyncHandler.js";
 import ApiResponse from "./utils/ApiResponse.js";
 
+import authRouter from "./routes/auth.routes.js";
+
 const app = express();
 
 // Health Check Route
@@ -32,5 +34,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use("/api/v1/auth", authRouter);
 
 export default app;
