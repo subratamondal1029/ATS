@@ -8,9 +8,9 @@ services:
     ports:
       - "27018:27017" # Internal: 27017, External: 27018 for mongosh
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
-      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-ATS}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
@@ -49,13 +49,9 @@ services:
     restart: unless-stopped
     ports:
       - "8000:8000"
-    environment:
-      NODE_ENV: development
-      PORT: 8000
-      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ATS?authSource=admin}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
-      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+    env_file:
+      - .env # Root shared variables
+      - ./backend/.env # Backend specific variables
     volumes:
       - ./backend/src:/app/src
       - ./backend/package.json:/app/package.json
@@ -85,8 +81,8 @@ services:
     restart: unless-stopped
     ports:
       - "5173:5173"
-    environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    env_file:
+      - ./frontend/.env # Frontend specific variables
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
@@ -106,10 +102,9 @@ services:
       target: development
     container_name: ats-worker
     restart: unless-stopped
-    environment:
-      NODE_ENV: development
-      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ATS?authSource=admin}
-      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    env_file:
+      - .env # Root shared variables
+      - ./worker/.env # Worker specific variables
     volumes:
       - ./worker/src:/app/src
       - ./worker/package.json:/app/package.json
