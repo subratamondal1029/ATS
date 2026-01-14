@@ -1,0 +1,137 @@
+# Dev Docker Compose Configuration for ATS Application
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: ats-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017" # Internal: 27017, External: 27018 for mongosh
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-ats_dev}
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - ats-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for Worker Queue
+  redis:
+    image: redis:7-alpine
+    container_name: ats-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ats-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: development
+    container_name: ats-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      NODE_ENV: development
+      PORT: 8000
+      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ats_dev?authSource=admin}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/package.json:/app/package.json
+      - ./tsconfig.base.json:/app/tsconfig.base.json
+      - backend_node_modules:/app/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ats-network
+    command: npm run dev
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+      target: development
+    container_name: ats-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      - ./frontend/package.json:/app/package.json
+      - ./tsconfig.base.json:/app/tsconfig.base.json
+      - frontend_node_modules:/app/node_modules
+    networks:
+      - ats-network
+    command: npm run dev -- --host 0.0.0.0
+
+  # Worker Service
+  worker:
+    build:
+      context: .
+      dockerfile: ./worker/Dockerfile
+      target: development
+    container_name: ats-worker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      MONGO_URI: ${MONGO_URI:-mongodb://admin:admin123@mongodb:27017/ats_dev?authSource=admin}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
+    volumes:
+      - ./worker/src:/app/src
+      - ./worker/package.json:/app/package.json
+      - ./tsconfig.base.json:/app/tsconfig.base.json
+      - worker_node_modules:/app/node_modules
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ats-network
+
+networks:
+  ats-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+  redis_data:
+    driver: local
+  backend_node_modules:
+    driver: local
+  frontend_node_modules:
+    driver: local
+  worker_node_modules:
+    driver: local
